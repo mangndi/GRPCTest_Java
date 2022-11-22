@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package equity;
+
+option java_package="com.equity";
+option java_multiple_files=true;
+
+message CreateOrderStruc {
+  int32 SideType = 1; //  All = 0;  Buy = 1; Sell = 2; Switch = 3; // Mutual Fund ONLY
+  int32 Instrument = 2; // 0 : Equity, 1 : Mutual Fund
+  string Symbol = 3; // Kode Saham
+  string Exchange = 4;  // IDX :
+  string ClientID = 5; //15 Char
+  int64 Quantity = 6; // in Lot
+  int32 Price = 7;
+  int32 BoardType = 8; //   RG = 0; TN = 1; NG = 2;
+  int32 PreventDuplicate = 9; // 0 : Ya, 1: No
+  int32 TimeInForce = 10; //   Day = 0; GTC = 1; GTD = 2; Session = 3;
+  string ExpireDate = 11;
+  int32 UserConfirmed = 12;  // 0 : Ya, 1: No
+  string MarketData = 13;
+  string DeviceOrderID = 14;
+  string DeviceID = 15;
+  string LocalIpAddress = 16;
+  string UserID = 17;
+}
+
+message ReplaceOrderStruc {
+  string OrderID = 1;   // Required
+  string ClientID = 2;  // Required
+  int64 Quantity = 3;   // Required, using LOT unit
+  int32 Price = 4;      // Required
+  string Remark = 5;    // Optional
+  string DeviceOrderID = 6;
+  string DeviceID = 7;
+  string LocalIpAddress = 8;
+  string UserID = 9;
+}
+
+message CancelOrderStruc {
+  string OrderID = 1;   // Required
+  string ClientID = 2;  // Required
+  string Remark = 3;    // Optional
+  string DeviceOrderID = 4;
+  string DeviceID = 5;
+  string LocalIpAddress = 6;
+  string UserID = 7;
+}
+
+message CreateNewOrder{
+  CreateOrderStruc dataOrder = 1;
+}
+
+message ReplaceOrder{
+  ReplaceOrderStruc dataOrder = 1;
+}
+
+message CancelOrder{
+  CancelOrderStruc dataOrder = 1;
+}
+
+message OrderResult {
+  string ResponseID = 1;
+}
+
+message SubsOrderList {
+  string clientID = 1;
+}
+
+message OrderDetailStruc {
+  int32 ID = 1;
+  int32 DeviceOrderID = 2;
+  int32 OrderID =3;
+  string ClientID = 4;
+  string OrderTime = 5;
+  string Symbol = 6;
+  string Board = 7;
+  string Exchange = 8;
+  int32 Qty = 9;
+  int32 MatchQty = 10;
+  int32 CanceledQty = 11;
+  int32 Price = 12;
+  string Status = 13;
+  string desc = 14;
+  string UserID = 15;
+  int32 ForcedToSell = 16;  /*
+  string MarketClientOrderID = 1;
+  string OrderID = 2;
+  int32 OrderStatus = 3; // 0 : pending New., 1 : Open, 2 : Match, 3 : Amended, 4 : canceled, 5 : partial,  6 : Rejected
+  string MarketOrderID = 4; // Broker reference
+  int64 OrderQuantity = 5;
+  int64 MatchedQuantity = 6; // MatchedQuantity per trade
+  int32 OrderPrice = 7;
+  int32 MatchedPrice = 8;
+  string CreatedDatetime = 9; // default is zero time
+  string TransactionDatetime = 10; // default is zero time
+  string AcceptedDatetime = 11; // default is zero time
+  string TradeID = 12;
+  string MarketTradeID = 13;
+  string Remark = 14;
+  int32 InstructionID = 15; //  InstructionNew = 1;  InstructionRevise = 2;
+  string Source = 16; // RMS, OMS, IDX
+  int32 Side = 17;
+
+  int32 Instrument = 18; // 0 : Equity, 1 : Mutual Fund
+  string Symbol = 19; // Kode Saham
+  string Exchange = 20;  // IDX :
+
+  string Board = 21;
+  string TradingID = 22; // SID
+  int32 TimeInForce = 23;
+  string ExchangeCode = 24;
+  string ClientID = 25;
+  int64 OrderQuantityLot = 26; // OrderQuantity / configured lot size
+  int64 MatchedQuantityLot = 27; // MatchedQuantity per trade / configured lot size
+  int64 TotalMatchedQuantity = 28; // Total matched quantity (cummulative)
+  int64 TotalMatchedQuantityLot = 29; // Total matched quantity lot (cummulative)
+  bool ForcedToSell = 30;
+  string UserID = 31;
+  int64 index = 32; // setiap perubahan index berganti untuk memastikan data terkirim ke client
+*/
+}
+
+message OrderDetailItems{
+  OrderDetailStruc orderItem = 1;
+}
+
+message SubsProbe{
+  string requestID = 1;
+}
+
+message ResponseProbe {
+  int64 counter = 1;
+}
+
+
+message SubsProbeOL{
+  string clientID = 1;
+}
+
+message ResponseProbeOL {
+  int64 counter = 1;
+}
+
+service IDXEquityService {
+  rpc sendNewOrder(CreateNewOrder) returns (OrderResult);
+  rpc sendReplaceOrder(ReplaceOrder) returns (stream OrderResult);
+  rpc sendCancelOrder(CancelOrder) returns (stream OrderResult);
+  rpc sendSubsOrderList(SubsOrderList) returns (stream OrderDetailItems);
+  rpc getProbe(SubsProbe) returns (stream ResponseProbe);
+  rpc getProbeOL(SubsProbeOL) returns (ResponseProbeOL);
+}

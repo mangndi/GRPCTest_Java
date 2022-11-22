@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package equity;
+
+option java_package="com.equity";
+option java_multiple_files=true;
+
+// Market Data
+message RunningTradesStruc {
+  string Time = 1;
+  string Symbol = 2;
+  int32 MatchedPrice = 3;
+  int32 Change = 4;
+  int64 Vol = 5;
+  int64 Index = 6;
+}
+
+message SubsRunningTrades {
+  string key = 1;
+}
+
+message RunningTradesResponse {
+  RunningTradesStruc RunningTrades = 1;
+}
+
+
+message SubsProbeMD{
+  string requestID = 1;
+}
+
+message ResponseProbeMD {
+  int64 counter = 1;
+}
+
+service IDXMarketDataService {
+  rpc getProbeMD(SubsProbeMD) returns (ResponseProbeMD);
+  rpc sendSubsRunningTrades(SubsRunningTrades) returns  (stream RunningTradesResponse);
+}

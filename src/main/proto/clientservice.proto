@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package equity;
+
+option java_package="com.equity";
+option java_multiple_files=true;
+
+message PortfolioEquity {
+  int32 id = 1; // nomor urut
+  string Symbol = 2; // Kode Saham
+  string Exchange = 3;  // IDX :
+  string ClientID = 4; //15 Char
+  int64 Quantity = 5; // in Lot
+  int64 LotSize = 6; // in Lot
+  int32 Price = 7;
+  int32 Haircut = 8; // nilai harus dibagi 100
+  int32 IsBlocked = 9; //
+}
+
+message RequestPE { // Request Portfolio Equity
+  string clientid = 1;
+}
+message ResponsePE {
+  PortfolioEquity porto = 1;
+}
+
+// Service yang dipakai client ke server Gateway
+service ClientService {
+  rpc getPortfolioEquity(RequestPE) returns (stream ResponsePE);
+
+}
+
+// service yang dipakai server gateway ke backend (DB Service)
+service DBService{
+  rpc getPortfolioEquityDB(RequestPE) returns (stream ResponsePE);
+}
